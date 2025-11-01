@@ -1,36 +1,105 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LegacyLens 🔮
 
-## Getting Started
+AI-powered code analysis tool that scans GitHub repositories and generates a "Future Pain Timeline" showing how code issues will worsen over time.
 
-First, run the development server:
+## Tech Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Framework:** Next.js 14 (App Router)
+- **Language:** TypeScript
+- **Agent Framework:** LangGraph (multi-step agent workflow)
+- **APIs:**
+  - Greptile API (codebase analysis)
+  - OpenAI GPT-4 (generating explanations)
+  - GitHub API (repository metadata)
+- **Streaming:** Server-Sent Events (SSE) for real-time updates
+
+## Project Structure
+
+```
+/app
+  /api
+    /scan
+      route.ts              # POST endpoint to start scan
+    /scan/[id]
+      route.ts              # GET endpoint for scan status/results
+    /scan/[id]/stream
+      route.ts              # SSE endpoint for live updates
+    /roadmap/[id]
+      route.ts              # GET endpoint to download roadmap.md
+/lib
+  /agent
+    graph.ts                # LangGraph agent definition
+    nodes.ts                # Agent nodes (plan, hunt, explain, write)
+    state.ts                # Agent state type definitions
+  /detectors
+    security.ts             # Security issue detectors
+    reliability.ts          # Reliability issue detectors
+    maintainability.ts      # Maintainability issue detectors
+    index.ts                # Detector registry
+  /tools
+    greptile.ts             # Greptile API client
+    github.ts               # GitHub API client
+    llm.ts                  # OpenAI client wrapper
+  /utils
+    timeline.ts             # Timeline prediction generator
+    scoring.ts              # Severity and ETA calculation
+    roadmap.ts              # Markdown roadmap generator
+/types
+  index.ts                  # TypeScript interfaces
+/data
+  scans.json                # Temporary storage (file-based)
+  /cache                    # Greptile response cache
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. **Set up environment variables:**
+   ```bash
+   cp .env.local.example .env.local
+   ```
+   Then edit `.env.local` and add your API keys:
+   - `GREPTILE_API_KEY` - Get from https://app.greptile.com
+   - `OPENAI_API_KEY` - Get from https://platform.openai.com
+   - `GITHUB_TOKEN` - Optional, for private repos
 
-## Learn More
+3. **Run development server:**
+   ```bash
+   npm run dev
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+4. **Open http://localhost:3000**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Development Progress
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- [x] Phase 1: Project Setup & Core Types
+- [ ] Phase 2: Greptile Client
+- [ ] Phase 3: Detectors
+- [ ] Phase 4: LLM & Utilities
+- [ ] Phase 5: LangGraph Agent
+- [ ] Phase 6: API Routes
+- [ ] Phase 7: Testing & Demo Data
 
-## Deploy on Vercel
+## How It Works
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. User submits a GitHub repository URL
+2. LangGraph agent orchestrates a multi-step analysis:
+   - **Plan:** Index repo with Greptile, detect languages/frameworks
+   - **Hunt:** Run security, reliability, and maintainability detectors
+   - **Explain:** Use GPT-4 to generate timeline predictions for each issue
+   - **Write:** Generate downloadable refactor roadmap
+3. Results stream in real-time via SSE
+4. Frontend displays "Future Pain Timeline" visualization
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Test Repositories
+
+- https://github.com/vercel/next.js (large, well-maintained)
+- https://github.com/facebook/react (very large)
+
+## License
+
+MIT
