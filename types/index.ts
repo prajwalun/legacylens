@@ -54,7 +54,6 @@ export interface ScanResult {
 export interface AgentState {
   scanId: string;
   repoUrl: string;
-  repoId?: string;
   repoMetadata?: {
     languages: string[];
     frameworks: string[];
