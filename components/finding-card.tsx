@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import TimelineVisualization from "@/components/timeline-viz"
 import CodeBlock from "@/components/code-block"
-import { Clock, Gem, ExternalLink } from "lucide-react"
+import { Clock, Wrench, ExternalLink } from "lucide-react"
 import type { Finding } from "@/types"
 
 interface FindingCardProps {
@@ -45,9 +45,9 @@ const severityConfig = {
 }
 
 const etaConfig = {
-  easy: { color: "text-green-500", label: "EASY" },
-  medium: { color: "text-yellow-500", label: "MEDIUM" },
-  large: { color: "text-red-500", label: "LARGE" },
+  easy: { color: "text-green-500", label: "≤15 min fix" },
+  medium: { color: "text-yellow-500", label: "30-60 min fix" },
+  large: { color: "text-red-500", label: ">60 min fix" },
 }
 
 export default function FindingCard({ finding, repoUrl }: FindingCardProps) {
@@ -109,7 +109,7 @@ export default function FindingCard({ finding, repoUrl }: FindingCardProps) {
             <span>{finding.minutesSaved} min</span>
           </div>
           <div className={`flex items-center gap-1 font-semibold ${etaConf.color}`}>
-            <Gem className="w-4 h-4" />
+            <Wrench className="w-4 h-4" />
             <span>{etaConf.label}</span>
           </div>
         </div>

@@ -1,1 +1,567 @@
-{}
+{
+  "8f99400f-b7b0-44ac-bb94-f041c44dabab": {
+    "id": "8f99400f-b7b0-44ac-bb94-f041c44dabab",
+    "repoUrl": "https://github.com/prajwalun/bad-repo",
+    "status": "completed",
+    "findings": [
+      {
+        "id": "c8b65dc0-d7de-47b8-8473-fbca4d07c390",
+        "ruleId": "eval-usage",
+        "category": "security",
+        "severity": "high",
+        "eta": "medium",
+        "file": "src/api/auth.js",
+        "line": 9,
+        "snippet": "const result = eval(expression);  // ⚠️ EVAL",
+        "title": "The code uses eval() or exec() which allows arbitrary code execution",
+        "explanation": "The code uses eval() or exec() which allows arbitrary code execution. This is a major security risk that can be exploited to run malicious code.",
+        "fix": "// Remove eval() and use safer alternatives like JSON.parse()",
+        "timeline": {
+          "t3m": "Code review flags this",
+          "t6m": "Security policy violation",
+          "t1y": "XSS attack vector identified",
+          "t2y": "Remote code execution exploit"
+        },
+        "minutesSaved": 14
+      },
+      {
+        "id": "ef8d93b4-2ee3-4e7d-93cb-51b20a156cf2",
+        "ruleId": "eval-usage",
+        "category": "security",
+        "severity": "high",
+        "eta": "medium",
+        "file": "src/api/auth.js",
+        "line": 17,
+        "snippet": "const fn = new Function('return ' + code);  // ⚠️ DANGEROUS",
+        "title": "The code uses eval() or exec() which allows arbitrary code execution",
+        "explanation": "The code uses eval() or exec() which allows arbitrary code execution. This is a major security risk that can be exploited to run malicious code.",
+        "fix": "// Remove eval() and use safer alternatives like JSON.parse()",
+        "timeline": {
+          "t3m": "Code review flags this",
+          "t6m": "Security policy violation",
+          "t1y": "XSS attack vector identified",
+          "t2y": "Remote code execution exploit"
+        },
+        "minutesSaved": 14
+      },
+      {
+        "id": "339508b7-c4f8-42e1-b151-8565141f6aa9",
+        "ruleId": "eval-usage",
+        "category": "security",
+        "severity": "high",
+        "eta": "medium",
+        "file": "src/api/auth.js",
+        "line": 31,
+        "snippet": "const result = eval(op);  // ⚠️ EVAL",
+        "title": "The code uses eval() or exec() which allows arbitrary code execution",
+        "explanation": "The code uses eval() or exec() which allows arbitrary code execution. This is a major security risk that can be exploited to run malicious code.",
+        "fix": "// Remove eval() and use safer alternatives like JSON.parse()",
+        "timeline": {
+          "t3m": "Code review flags this",
+          "t6m": "Security policy violation",
+          "t1y": "XSS attack vector identified",
+          "t2y": "Remote code execution exploit"
+        },
+        "minutesSaved": 14
+      },
+      {
+        "id": "c24d27d0-fa84-4bc6-a253-17aa25658396",
+        "ruleId": "empty-catch",
+        "category": "reliability",
+        "severity": "medium",
+        "eta": "easy",
+        "file": "src/api/users.js",
+        "line": 19,
+        "snippet": "} catch (e) {}  // ⚠️ EMPTY CATCH",
+        "title": "Errors are caught but not handled, causing silent failures",
+        "explanation": "Errors are caught but not handled, causing silent failures. This makes debugging extremely difficult and can lead to data corruption going unnoticed.",
+        "fix": "catch (error) {\n  console.error(\"Operation failed:\", error);\n  throw error;\n}",
+        "timeline": {
+          "t3m": "Errors silently ignored",
+          "t6m": "Debugging becomes nightmare",
+          "t1y": "Production bugs go unnoticed",
+          "t2y": "Data corruption undetected"
+        },
+        "minutesSaved": 9
+      },
+      {
+        "id": "e8b75d9e-c6f9-49d4-b29e-9c34bb7a5cd1",
+        "ruleId": "magic-numbers",
+        "category": "maintainability",
+        "severity": "low",
+        "eta": "easy",
+        "file": "src/app.js",
+        "line": 24,
+        "snippet": "res.json({ status: 'ok', port: 3000 });  // ⚠️ MAGIC NUMBER",
+        "title": "Numeric literals are used directly without named constants, making the code hard to understand and maintain",
+        "explanation": "Numeric literals are used directly without named constants, making the code hard to understand and maintain. Changes require hunting for all instances.",
+        "fix": "const MAX_RETRIES = 3;\n// Use the constant instead of literal",
+        "timeline": {
+          "t3m": "TODO: what does 50 mean?",
+          "t6m": "FIXME: need to change limit",
+          "t1y": "Can't find all instances",
+          "t2y": "Inconsistent limits everywhere"
+        },
+        "minutesSaved": 5
+      },
+      {
+        "id": "f0e39cb1-8225-44dc-8210-e031a3928932",
+        "ruleId": "magic-numbers",
+        "category": "maintainability",
+        "severity": "low",
+        "eta": "easy",
+        "file": "src/config/api-keys.js",
+        "line": 10,
+        "snippet": "const SECRET_TOKEN = \"my-secret-token-12345\"; // FIXME: This is exposed",
+        "title": "Numeric literals are used directly without named constants, making the code hard to understand and maintain",
+        "explanation": "Numeric literals are used directly without named constants, making the code hard to understand and maintain. Changes require hunting for all instances.",
+        "fix": "const MAX_RETRIES = 3;\n// Use the constant instead of literal",
+        "timeline": {
+          "t3m": "TODO: what does 50 mean?",
+          "t6m": "FIXME: need to change limit",
+          "t1y": "Can't find all instances",
+          "t2y": "Inconsistent limits everywhere"
+        },
+        "minutesSaved": 5
+      },
+      {
+        "id": "6804d69d-d271-4470-b6b5-c57790e6ded5",
+        "ruleId": "magic-numbers",
+        "category": "maintainability",
+        "severity": "low",
+        "eta": "easy",
+        "file": "src/config/database.js",
+        "line": 5,
+        "snippet": "port: 5432,",
+        "title": "Numeric literals are used directly without named constants, making the code hard to understand and maintain",
+        "explanation": "Numeric literals are used directly without named constants, making the code hard to understand and maintain. Changes require hunting for all instances.",
+        "fix": "const MAX_RETRIES = 3;\n// Use the constant instead of literal",
+        "timeline": {
+          "t3m": "TODO: what does 50 mean?",
+          "t6m": "FIXME: need to change limit",
+          "t1y": "Can't find all instances",
+          "t2y": "Inconsistent limits everywhere"
+        },
+        "minutesSaved": 5
+      },
+      {
+        "id": "8da6870f-da2d-4cd6-91a6-bef1142d4ca8",
+        "ruleId": "empty-catch",
+        "category": "reliability",
+        "severity": "medium",
+        "eta": "easy",
+        "file": "src/controllers/mega-controller.js",
+        "line": 35,
+        "snippet": "} catch (e) {}  // ⚠️ EMPTY CATCH",
+        "title": "Errors are caught but not handled, causing silent failures",
+        "explanation": "Errors are caught but not handled, causing silent failures. This makes debugging extremely difficult and can lead to data corruption going unnoticed.",
+        "fix": "catch (error) {\n  console.error(\"Operation failed:\", error);\n  throw error;\n}",
+        "timeline": {
+          "t3m": "Errors silently ignored",
+          "t6m": "Debugging becomes nightmare",
+          "t1y": "Production bugs go unnoticed",
+          "t2y": "Data corruption undetected"
+        },
+        "minutesSaved": 9
+      },
+      {
+        "id": "0536589e-5338-412f-b93a-582fbf47a1a8",
+        "ruleId": "empty-catch",
+        "category": "reliability",
+        "severity": "medium",
+        "eta": "easy",
+        "file": "src/controllers/mega-controller.js",
+        "line": 80,
+        "snippet": "} catch (e) {}  // ⚠️ EMPTY CATCH",
+        "title": "Errors are caught but not handled, causing silent failures",
+        "explanation": "Errors are caught but not handled, causing silent failures. This makes debugging extremely difficult and can lead to data corruption going unnoticed.",
+        "fix": "catch (error) {\n  console.error(\"Operation failed:\", error);\n  throw error;\n}",
+        "timeline": {
+          "t3m": "Errors silently ignored",
+          "t6m": "Debugging becomes nightmare",
+          "t1y": "Production bugs go unnoticed",
+          "t2y": "Data corruption undetected"
+        },
+        "minutesSaved": 9
+      },
+      {
+        "id": "74997ca7-f54a-449a-a9d9-854bb904e4c0",
+        "ruleId": "magic-numbers",
+        "category": "maintainability",
+        "severity": "low",
+        "eta": "easy",
+        "file": "src/controllers/mega-controller.js",
+        "line": 110,
+        "snippet": "if (amount > 1000) {  // ⚠️ MAGIC NUMBER",
+        "title": "Numeric literals are used directly without named constants, making the code hard to understand and maintain",
+        "explanation": "Numeric literals are used directly without named constants, making the code hard to understand and maintain. Changes require hunting for all instances.",
+        "fix": "const MAX_RETRIES = 3;\n// Use the constant instead of literal",
+        "timeline": {
+          "t3m": "TODO: what does 50 mean?",
+          "t6m": "FIXME: need to change limit",
+          "t1y": "Can't find all instances",
+          "t2y": "Inconsistent limits everywhere"
+        },
+        "minutesSaved": 5
+      },
+      {
+        "id": "69771a84-fd7d-4f79-9c9a-127a095c359a",
+        "ruleId": "magic-numbers",
+        "category": "maintainability",
+        "severity": "low",
+        "eta": "easy",
+        "file": "src/controllers/mega-controller.js",
+        "line": 114,
+        "snippet": "if (amount > 10000) {  // ⚠️ MAGIC NUMBER",
+        "title": "Numeric literals are used directly without named constants, making the code hard to understand and maintain",
+        "explanation": "Numeric literals are used directly without named constants, making the code hard to understand and maintain. Changes require hunting for all instances.",
+        "fix": "const MAX_RETRIES = 3;\n// Use the constant instead of literal",
+        "timeline": {
+          "t3m": "TODO: what does 50 mean?",
+          "t6m": "FIXME: need to change limit",
+          "t1y": "Can't find all instances",
+          "t2y": "Inconsistent limits everywhere"
+        },
+        "minutesSaved": 5
+      },
+      {
+        "id": "755c41f3-c22e-4911-afa8-d49cc6bd0125",
+        "ruleId": "empty-catch",
+        "category": "reliability",
+        "severity": "medium",
+        "eta": "easy",
+        "file": "src/controllers/mega-controller.js",
+        "line": 169,
+        "snippet": "} catch (e) {}  // ⚠️ EMPTY CATCH",
+        "title": "Errors are caught but not handled, causing silent failures",
+        "explanation": "Errors are caught but not handled, causing silent failures. This makes debugging extremely difficult and can lead to data corruption going unnoticed.",
+        "fix": "catch (error) {\n  console.error(\"Operation failed:\", error);\n  throw error;\n}",
+        "timeline": {
+          "t3m": "Errors silently ignored",
+          "t6m": "Debugging becomes nightmare",
+          "t1y": "Production bugs go unnoticed",
+          "t2y": "Data corruption undetected"
+        },
+        "minutesSaved": 9
+      },
+      {
+        "id": "b1e69ec8-b062-46e0-89ba-3cacb2eb17f4",
+        "ruleId": "empty-catch",
+        "category": "reliability",
+        "severity": "medium",
+        "eta": "easy",
+        "file": "src/controllers/mega-controller.js",
+        "line": 206,
+        "snippet": "} catch (e) {}  // ⚠️ EMPTY CATCH",
+        "title": "Errors are caught but not handled, causing silent failures",
+        "explanation": "Errors are caught but not handled, causing silent failures. This makes debugging extremely difficult and can lead to data corruption going unnoticed.",
+        "fix": "catch (error) {\n  console.error(\"Operation failed:\", error);\n  throw error;\n}",
+        "timeline": {
+          "t3m": "Errors silently ignored",
+          "t6m": "Debugging becomes nightmare",
+          "t1y": "Production bugs go unnoticed",
+          "t2y": "Data corruption undetected"
+        },
+        "minutesSaved": 9
+      },
+      {
+        "id": "942a1a4c-8868-4333-9149-b462d1fca152",
+        "ruleId": "empty-catch",
+        "category": "reliability",
+        "severity": "medium",
+        "eta": "easy",
+        "file": "src/controllers/mega-controller.js",
+        "line": 221,
+        "snippet": "} catch (e) {}  // ⚠️ EMPTY CATCH",
+        "title": "Errors are caught but not handled, causing silent failures",
+        "explanation": "Errors are caught but not handled, causing silent failures. This makes debugging extremely difficult and can lead to data corruption going unnoticed.",
+        "fix": "catch (error) {\n  console.error(\"Operation failed:\", error);\n  throw error;\n}",
+        "timeline": {
+          "t3m": "Errors silently ignored",
+          "t6m": "Debugging becomes nightmare",
+          "t1y": "Production bugs go unnoticed",
+          "t2y": "Data corruption undetected"
+        },
+        "minutesSaved": 9
+      },
+      {
+        "id": "6612de52-191e-4ae5-8359-9231bf040c6d",
+        "ruleId": "empty-catch",
+        "category": "reliability",
+        "severity": "medium",
+        "eta": "easy",
+        "file": "src/controllers/mega-controller.js",
+        "line": 230,
+        "snippet": "} catch (e) {}  // ⚠️ EMPTY CATCH",
+        "title": "Errors are caught but not handled, causing silent failures",
+        "explanation": "Errors are caught but not handled, causing silent failures. This makes debugging extremely difficult and can lead to data corruption going unnoticed.",
+        "fix": "catch (error) {\n  console.error(\"Operation failed:\", error);\n  throw error;\n}",
+        "timeline": {
+          "t3m": "Errors silently ignored",
+          "t6m": "Debugging becomes nightmare",
+          "t1y": "Production bugs go unnoticed",
+          "t2y": "Data corruption undetected"
+        },
+        "minutesSaved": 9
+      },
+      {
+        "id": "3bcfc6bc-e9f7-431a-9991-cef5412a3d7d",
+        "ruleId": "empty-catch",
+        "category": "reliability",
+        "severity": "medium",
+        "eta": "easy",
+        "file": "src/controllers/mega-controller.js",
+        "line": 261,
+        "snippet": "} catch (e) {}  // ⚠️ EMPTY CATCH",
+        "title": "Errors are caught but not handled, causing silent failures",
+        "explanation": "Errors are caught but not handled, causing silent failures. This makes debugging extremely difficult and can lead to data corruption going unnoticed.",
+        "fix": "catch (error) {\n  console.error(\"Operation failed:\", error);\n  throw error;\n}",
+        "timeline": {
+          "t3m": "Errors silently ignored",
+          "t6m": "Debugging becomes nightmare",
+          "t1y": "Production bugs go unnoticed",
+          "t2y": "Data corruption undetected"
+        },
+        "minutesSaved": 9
+      },
+      {
+        "id": "b77bd631-ae95-40ca-aa71-9b8a460ebeef",
+        "ruleId": "empty-catch",
+        "category": "reliability",
+        "severity": "medium",
+        "eta": "easy",
+        "file": "src/controllers/mega-controller.js",
+        "line": 270,
+        "snippet": "} catch (e) {}  // ⚠️ EMPTY CATCH",
+        "title": "Errors are caught but not handled, causing silent failures",
+        "explanation": "Errors are caught but not handled, causing silent failures. This makes debugging extremely difficult and can lead to data corruption going unnoticed.",
+        "fix": "catch (error) {\n  console.error(\"Operation failed:\", error);\n  throw error;\n}",
+        "timeline": {
+          "t3m": "Errors silently ignored",
+          "t6m": "Debugging becomes nightmare",
+          "t1y": "Production bugs go unnoticed",
+          "t2y": "Data corruption undetected"
+        },
+        "minutesSaved": 9
+      },
+      {
+        "id": "1e178896-fedd-43a2-803b-4c15c3818dde",
+        "ruleId": "magic-numbers",
+        "category": "maintainability",
+        "severity": "low",
+        "eta": "easy",
+        "file": "src/controllers/mega-controller.js",
+        "line": 284,
+        "snippet": "} else if (type === 2) {  // ⚠️ MAGIC NUMBER",
+        "title": "Numeric literals are used directly without named constants, making the code hard to understand and maintain",
+        "explanation": "Numeric literals are used directly without named constants, making the code hard to understand and maintain. Changes require hunting for all instances.",
+        "fix": "const MAX_RETRIES = 3;\n// Use the constant instead of literal",
+        "timeline": {
+          "t3m": "TODO: what does 50 mean?",
+          "t6m": "FIXME: need to change limit",
+          "t1y": "Can't find all instances",
+          "t2y": "Inconsistent limits everywhere"
+        },
+        "minutesSaved": 5
+      },
+      {
+        "id": "bab07d80-bfa5-4273-9cf4-e48e74ea2f7a",
+        "ruleId": "magic-numbers",
+        "category": "maintainability",
+        "severity": "low",
+        "eta": "easy",
+        "file": "src/controllers/mega-controller.js",
+        "line": 286,
+        "snippet": "} else if (type === 3) {  // ⚠️ MAGIC NUMBER",
+        "title": "Numeric literals are used directly without named constants, making the code hard to understand and maintain",
+        "explanation": "Numeric literals are used directly without named constants, making the code hard to understand and maintain. Changes require hunting for all instances.",
+        "fix": "const MAX_RETRIES = 3;\n// Use the constant instead of literal",
+        "timeline": {
+          "t3m": "TODO: what does 50 mean?",
+          "t6m": "FIXME: need to change limit",
+          "t1y": "Can't find all instances",
+          "t2y": "Inconsistent limits everywhere"
+        },
+        "minutesSaved": 5
+      },
+      {
+        "id": "4f8c960c-7280-40e5-bd17-79a9eab8c9ec",
+        "ruleId": "empty-catch",
+        "category": "reliability",
+        "severity": "medium",
+        "eta": "easy",
+        "file": "src/controllers/mega-controller.js",
+        "line": 295,
+        "snippet": "} catch (e) {}  // ⚠️ EMPTY CATCH",
+        "title": "Errors are caught but not handled, causing silent failures",
+        "explanation": "Errors are caught but not handled, causing silent failures. This makes debugging extremely difficult and can lead to data corruption going unnoticed.",
+        "fix": "catch (error) {\n  console.error(\"Operation failed:\", error);\n  throw error;\n}",
+        "timeline": {
+          "t3m": "Errors silently ignored",
+          "t6m": "Debugging becomes nightmare",
+          "t1y": "Production bugs go unnoticed",
+          "t2y": "Data corruption undetected"
+        },
+        "minutesSaved": 9
+      },
+      {
+        "id": "d9a7c759-a0e3-4cb0-86c7-3219fbdbf46d",
+        "ruleId": "empty-catch",
+        "category": "reliability",
+        "severity": "medium",
+        "eta": "easy",
+        "file": "src/controllers/mega-controller.js",
+        "line": 344,
+        "snippet": "} catch (e) {}  // ⚠️ EMPTY CATCH",
+        "title": "Errors are caught but not handled, causing silent failures",
+        "explanation": "Errors are caught but not handled, causing silent failures. This makes debugging extremely difficult and can lead to data corruption going unnoticed.",
+        "fix": "catch (error) {\n  console.error(\"Operation failed:\", error);\n  throw error;\n}",
+        "timeline": {
+          "t3m": "Errors silently ignored",
+          "t6m": "Debugging becomes nightmare",
+          "t1y": "Production bugs go unnoticed",
+          "t2y": "Data corruption undetected"
+        },
+        "minutesSaved": 9
+      },
+      {
+        "id": "1a7bf883-27dd-4b8e-89ac-b0f3484bc3a9",
+        "ruleId": "magic-numbers",
+        "category": "maintainability",
+        "severity": "low",
+        "eta": "easy",
+        "file": "src/controllers/mega-controller.js",
+        "line": 364,
+        "snippet": "if (order.total > 100) {  // Magic number",
+        "title": "Numeric literals are used directly without named constants, making the code hard to understand and maintain",
+        "explanation": "Numeric literals are used directly without named constants, making the code hard to understand and maintain. Changes require hunting for all instances.",
+        "fix": "const MAX_RETRIES = 3;\n// Use the constant instead of literal",
+        "timeline": {
+          "t3m": "TODO: what does 50 mean?",
+          "t6m": "FIXME: need to change limit",
+          "t1y": "Can't find all instances",
+          "t2y": "Inconsistent limits everywhere"
+        },
+        "minutesSaved": 5
+      },
+      {
+        "id": "d511ad99-e879-4eb8-9d41-f86bbd26c612",
+        "ruleId": "empty-catch",
+        "category": "reliability",
+        "severity": "medium",
+        "eta": "easy",
+        "file": "src/utils/logger.js",
+        "line": 6,
+        "snippet": "} catch (e) {}  // ⚠️ EMPTY CATCH - Errors silently swallowed",
+        "title": "Errors are caught but not handled, causing silent failures",
+        "explanation": "Errors are caught but not handled, causing silent failures. This makes debugging extremely difficult and can lead to data corruption going unnoticed.",
+        "fix": "catch (error) {\n  console.error(\"Operation failed:\", error);\n  throw error;\n}",
+        "timeline": {
+          "t3m": "Errors silently ignored",
+          "t6m": "Debugging becomes nightmare",
+          "t1y": "Production bugs go unnoticed",
+          "t2y": "Data corruption undetected"
+        },
+        "minutesSaved": 9
+      }
+    ],
+    "stats": {
+      "totalFiles": 14,
+      "totalLines": 0,
+      "languages": [
+        "JavaScript"
+      ],
+      "frameworks": [
+        "Node.js"
+      ],
+      "criticalCount": 0,
+      "highCount": 3,
+      "mediumCount": 12,
+      "lowCount": 8,
+      "totalMinutes": 190
+    },
+    "logs": [
+      {
+        "timestamp": 1762041606498,
+        "phase": "plan",
+        "message": "Initializing agent..."
+      },
+      {
+        "timestamp": 1762041606498,
+        "phase": "plan",
+        "message": "Connecting to repository..."
+      },
+      {
+        "timestamp": 1762041606498,
+        "phase": "plan",
+        "message": "Analyzing codebase structure..."
+      },
+      {
+        "timestamp": 1762041606782,
+        "phase": "plan",
+        "message": "Detected: JavaScript, Node.js"
+      },
+      {
+        "timestamp": 1762041606782,
+        "phase": "plan",
+        "message": "Files: 14 | Strategy: Security → Reliability → Maintainability"
+      },
+      {
+        "timestamp": 1762041606785,
+        "phase": "hunt",
+        "message": "Agent: Hunting for issues..."
+      },
+      {
+        "timestamp": 1762041607247,
+        "phase": "hunt",
+        "message": "✓ Security: 3 issues"
+      },
+      {
+        "timestamp": 1762041607247,
+        "phase": "hunt",
+        "message": "✓ Reliability: 12 issues"
+      },
+      {
+        "timestamp": 1762041607247,
+        "phase": "hunt",
+        "message": "✓ Maintainability: 8 issues"
+      },
+      {
+        "timestamp": 1762041607249,
+        "phase": "explain",
+        "message": "Agent: Generating timeline predictions..."
+      },
+      {
+        "timestamp": 1762041607249,
+        "phase": "explain",
+        "message": "└─ Analyzing 23 findings..."
+      },
+      {
+        "timestamp": 1762041614133,
+        "phase": "explain",
+        "message": "Agent: Calculating future pain impact..."
+      },
+      {
+        "timestamp": 1762041614135,
+        "phase": "write",
+        "message": "Agent: Compiling refactor roadmap..."
+      },
+      {
+        "timestamp": 1762041614135,
+        "phase": "write",
+        "message": "└─ Prioritizing by severity × effort..."
+      },
+      {
+        "timestamp": 1762041614135,
+        "phase": "write",
+        "message": "✓ Scan complete - Found 23 issues"
+      },
+      {
+        "timestamp": 1762041614135,
+        "phase": "write",
+        "message": "✓ Time saved: 3.2 hours"
+      }
+    ],
+    "createdAt": 1762041606484
+  }
+}
