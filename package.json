@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test:greptile": "tsx lib/tools/test-greptile.ts",
+    "test:greptile-detector": "tsx lib/detectors/test-greptile-detector.ts",
     "test:detectors": "tsx lib/detectors/test-detectors.ts",
     "test:utils": "tsx lib/utils/test-utils.ts",
     "test:agent": "tsx lib/agent/test-agent.ts"

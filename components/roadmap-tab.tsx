@@ -36,20 +36,30 @@ export default function RoadmapTab({ findings }: RoadmapTabProps) {
     setExpanded(newExpanded)
   }
 
+  // Helper function to get severity priority for sorting
+  const getSeverityPriority = (severity: string): number => {
+    switch (severity) {
+      case "critical": return 0
+      case "high": return 1
+      case "medium": return 2
+      case "low": return 3
+      default: return 4
+    }
+  }
+  
   const groupedFindings = {
-    high: findings.filter((f) => f.severity === "critical" || f.severity === "high"),
+    critical: findings.filter((f) => f.severity === "critical" || f.severity === "high")
+      .sort((a, b) => getSeverityPriority(a.severity) - getSeverityPriority(b.severity)),
     medium: findings.filter((f) => f.severity === "medium"),
     low: findings.filter((f) => f.severity === "low"),
   }
 
   const calculateStats = (items: Finding[]) => {
     const count = items.length
-    const hours = (items.reduce((sum, f) => sum + f.minutesSaved, 0) / 60).toFixed(1)
-    const cost = Math.round(Number.parseFloat(hours) * 85) // $85/hr rate
-    return { count, hours, cost }
+    return { count }
   }
 
-  const highStats = calculateStats(groupedFindings.high)
+  const criticalStats = calculateStats(groupedFindings.critical)
   const mediumStats = calculateStats(groupedFindings.medium)
   const lowStats = calculateStats(groupedFindings.low)
 
@@ -74,7 +84,7 @@ export default function RoadmapTab({ findings }: RoadmapTabProps) {
     md += `## Progress: ${totalCompleted}/${totalIssues} completed (${progressPercent}%)\n\n`
 
     const sections = [
-      { title: "🔴 High Priority", items: groupedFindings.high },
+      { title: "🔴 Critical Priority", items: groupedFindings.critical },
       { title: "🟡 Medium Priority", items: groupedFindings.medium },
       { title: "🔵 Low Priority", items: groupedFindings.low },
     ]
@@ -86,7 +96,6 @@ export default function RoadmapTab({ findings }: RoadmapTabProps) {
           md += `### ${i + 1}. ${finding.title}\n\n`
           md += `- **Location:** ${finding.file}:${finding.line}\n`
           md += `- **Severity:** ${finding.severity}\n`
-          md += `- **Time:** ${finding.minutesSaved} minutes\n`
           md += `- **Category:** ${finding.category}\n\n`
           md += `**Why it matters:**\n${finding.explanation}\n\n`
           md += `**Fix:**\n\`\`\`javascript\n${finding.fix}\n\`\`\`\n\n`
@@ -102,7 +111,7 @@ export default function RoadmapTab({ findings }: RoadmapTabProps) {
     title: string,
     emoji: string,
     items: Finding[],
-    stats: { count: number; hours: string; cost: number },
+    stats: { count: number },
   ) => {
     if (items.length === 0) return null
 
@@ -113,7 +122,7 @@ export default function RoadmapTab({ findings }: RoadmapTabProps) {
             {emoji} {title}
           </h3>
           <span className="text-sm text-muted-foreground">
-            ({stats.count} issues · {stats.hours}hrs · ${stats.cost})
+            ({stats.count} issues)
           </span>
         </div>
 
@@ -130,7 +139,7 @@ export default function RoadmapTab({ findings }: RoadmapTabProps) {
                   <div className={completed.has(finding.id) ? "line-through text-muted-foreground" : ""}>
                     <div className="font-medium text-foreground">{finding.title}</div>
                     <div className="text-sm text-muted-foreground">
-                      {finding.file}:{finding.line} · {finding.minutesSaved}min · {finding.category}
+                      {finding.file}:{finding.line} · {finding.category}
                     </div>
                   </div>
 
@@ -190,7 +199,7 @@ export default function RoadmapTab({ findings }: RoadmapTabProps) {
       </Card>
 
       {/* Groups */}
-      {renderGroup("HIGH PRIORITY", "🔴", groupedFindings.high, highStats)}
+      {renderGroup("CRITICAL PRIORITY", "🔴", groupedFindings.critical, criticalStats)}
       {renderGroup("MEDIUM PRIORITY", "🟡", groupedFindings.medium, mediumStats)}
       {renderGroup("LOW PRIORITY", "🔵", groupedFindings.low, lowStats)}
 

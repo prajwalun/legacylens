@@ -39,16 +39,18 @@ function CountUpNumber({ target, duration = 800 }: { target: number; duration?: 
 }
 
 export default function StatsBar({ stats }: StatsBarProps) {
-  const totalHours = (stats.totalMinutes / 60).toFixed(1)
+  // Combine critical and high into critical since we're standardizing on 3 severities
+  const criticalTotal = stats.criticalCount + stats.highCount
+  const totalIssues = criticalTotal + stats.mediumCount + stats.lowCount
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
       <Card className="bg-[#151b2e] border-[#1e2739] p-6 hover:-translate-y-1 transition-transform duration-300">
         <div className="text-center space-y-2">
           <div className="text-4xl font-bold text-[#ef4444]">
-            <CountUpNumber target={stats.highCount} />
+            <CountUpNumber target={criticalTotal} />
           </div>
-          <div className="text-sm text-muted-foreground">HIGH</div>
+          <div className="text-sm text-muted-foreground">CRITICAL</div>
           <div className="text-2xl">🔴</div>
         </div>
       </Card>
@@ -75,9 +77,11 @@ export default function StatsBar({ stats }: StatsBarProps) {
 
       <Card className="bg-[#151b2e] border-[#1e2739] p-6 hover:-translate-y-1 transition-transform duration-300">
         <div className="text-center space-y-2">
-          <div className="text-4xl font-bold text-primary">{totalHours}</div>
-          <div className="text-sm text-muted-foreground">Hours Saved</div>
-          <div className="text-2xl">⏱️</div>
+          <div className="text-4xl font-bold text-primary">
+            <CountUpNumber target={totalIssues} />
+          </div>
+          <div className="text-sm text-muted-foreground">TOTAL ISSUES</div>
+          <div className="text-2xl">📊</div>
         </div>
       </Card>
     </div>

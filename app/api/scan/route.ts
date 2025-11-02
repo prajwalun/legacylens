@@ -1,7 +1,7 @@
 // POST /api/scan - Start a new scan
 import { NextRequest, NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
-import { saveScan, updateScan } from '@/lib/storage/scans';
+import { saveScan, updateScan, getScan } from '@/lib/storage/scans';
 import { runAgent } from '@/lib/agent/graph';
 import type { ScanResult } from '@/types';
 
@@ -63,8 +63,12 @@ export async function POST(request: NextRequest) {
       createdAt: Date.now(),
     };
 
-    // Save initial scan
+    // Save initial scan (with lock protection)
     await saveScan(initialScan);
+    
+    // Wait for file system to fully commit the write
+    // This ensures the scan is available before the agent starts logging
+    await new Promise(resolve => setTimeout(resolve, 500));
 
     // Start agent in background (don't await)
     runAgentInBackground(scanId, repoUrl);
@@ -89,13 +93,13 @@ export async function POST(request: NextRequest) {
 
 /**
  * Run the agent workflow in background
- * This function doesn't block the API response
+ * Logs are streamed in real-time by individual nodes
  */
 async function runAgentInBackground(scanId: string, repoUrl: string) {
   try {
     console.log(`[API] Starting background agent for scan: ${scanId}`);
     
-    // Run the agent
+    // Run the agent (nodes handle real-time log streaming internally)
     const result = await runAgent(scanId, repoUrl);
 
     console.log(`[API] Agent completed for scan: ${scanId}`);

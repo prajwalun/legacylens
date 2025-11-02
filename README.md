@@ -179,9 +179,23 @@ Create `.env.local` with:
 # Required
 OPENAI_API_KEY=sk-proj-...
 
+# Optional - Greptile API for AI-powered detection
+GREPTILE_API_KEY=greptile-...
+
 # Optional (for higher GitHub API rate limits)
 GITHUB_TOKEN=ghp_...
+
+# Detection Mode (default: false = GitHub API pattern matching)
+# Options: false | true | hybrid
+USE_GREPTILE=false
 ```
+
+**Detection Modes:**
+- `false` (default): GitHub API + Regex patterns - Fast (15-20s), Free ⚡
+- `true`: Greptile AI-powered - Accurate (60-90s), Paid (~$0.50/scan) 🔮
+- `hybrid`: Smart scan - Quick first, deep AI if critical issues found ⚖️
+
+See [docs/ENV_CONFIG.md](docs/ENV_CONFIG.md) for detailed configuration.
 
 ### Run Development Server
 

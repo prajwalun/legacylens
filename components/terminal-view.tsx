@@ -29,6 +29,7 @@ export default function TerminalView({
   const [currentTypingLog, setCurrentTypingLog] = useState<string>("")
   const [typingCharIndex, setTypingCharIndex] = useState(0)
   const [hasNotifiedCompletion, setHasNotifiedCompletion] = useState(false)
+  const [startedTypingIndices, setStartedTypingIndices] = useState<Set<number>>(new Set())
 
   // Initialize with command line when logs arrive
   useEffect(() => {
@@ -60,9 +61,12 @@ export default function TerminalView({
     const numCompletedLines = lines.length - 1 // Subtract command line
     
     // Check if we need to start typing a new log
-    if (logs.length > numCompletedLines && currentTypingLog === "") {
+    if (logs.length > numCompletedLines && currentTypingLog === "" && !startedTypingIndices.has(numCompletedLines)) {
       const nextLog = logs[numCompletedLines]
       const formattedLog = `> [${nextLog.phase.toUpperCase()}] ${nextLog.message}`
+      
+      // Mark this log as started typing
+      setStartedTypingIndices(prev => new Set(prev).add(numCompletedLines))
       
       // Add realistic delay based on log content (simulate processing time)
       const getDelayForLog = (message: string, phase: string) => {
@@ -101,12 +105,13 @@ export default function TerminalView({
     if (currentTypingLog && typingCharIndex >= currentTypingLog.length) {
       setLines(prev => [...prev, {
         text: currentTypingLog,
+        delay: 0,
         // No timestamp - logs arrive too quickly to show meaningful elapsed time
       }])
       setCurrentTypingLog("")
       setTypingCharIndex(0)
     }
-  }, [logs, useRealLogs, lines.length, currentTypingLog, typingCharIndex])
+  }, [logs, useRealLogs, lines.length, currentTypingLog, typingCharIndex, startedTypingIndices])
 
   const terminalSequence: TerminalLine[] = [
     { text: `$ legacylens scan ${repoUrl}`, delay: 500 },
@@ -164,6 +169,7 @@ export default function TerminalView({
           ...prev,
           {
             text: displayedText,
+            delay: 0,
             timestamp: currentLine.timestamp,
           },
         ])
@@ -176,21 +182,42 @@ export default function TerminalView({
     }
   }, [currentLineIndex, charIndex, displayedText, terminalSequence, useRealLogs])
 
+  // Check if we're currently on a "Querying" or long-running operation
+  const isQuerying = currentTypingLog && (
+    currentTypingLog.includes('Querying') || 
+    currentTypingLog.includes('This may take')
+  )
+
   return (
     <div className="h-screen w-screen bg-black p-8 overflow-auto font-mono text-[#00ff41] crt-scanlines relative">
       <div className="space-y-1">
-        {lines.map((line, i) => (
-          <div key={i} className="flex items-start">
-            <span className="whitespace-pre">{line.text}</span>
-            {line.timestamp && <span className="text-[#00ff41]/60 ml-4 flex-shrink-0">{line.timestamp}</span>}
-          </div>
-        ))}
+        {lines.map((line, i) => {
+          const isQueryingLine = line.text && (
+            line.text.includes('Querying') || 
+            line.text.includes('This may take')
+          )
+          const isWaitingForNextLine = i === lines.length - 1 && !allLogsReceived
+          
+          return (
+            <div key={i} className="flex items-start">
+              <span className="whitespace-pre">{line.text}</span>
+              {isQueryingLine && isWaitingForNextLine && (
+                <span className="ml-2 inline-block animate-spin">⠋</span>
+              )}
+              {line.timestamp && <span className="text-[#00ff41]/60 ml-4 flex-shrink-0">{line.timestamp}</span>}
+            </div>
+          )
+        })}
         {/* Show currently typing log (ChatGPT/Claude style streaming) */}
         {useRealLogs && currentTypingLog && typingCharIndex > 0 && (
           <div className="flex items-start">
             <span className="whitespace-pre">
               {currentTypingLog.slice(0, typingCharIndex)}
-              <span className="animate-pulse">█</span>
+              {isQuerying ? (
+                <span className="ml-2 inline-block animate-spin">⠋</span>
+              ) : (
+                <span className="animate-pulse">█</span>
+              )}
             </span>
           </div>
         )}

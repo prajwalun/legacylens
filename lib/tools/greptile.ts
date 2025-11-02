@@ -413,6 +413,160 @@ export async function searchCode(
 }
 
 /**
+ * Query Greptile with natural language to find code issues (AI-powered)
+ * This is the CORRECT way to use Greptile - one AI query instead of 30+ searches
+ * @param repoId - Repository ID (format: github:main:owner/repo)
+ * @param sessionId - Unique session ID for tracking
+ * @param reindexAttempt - Internal counter to prevent infinite re-index loops
+ */
+export async function queryForIssues(
+  repoId: string,
+  sessionId: string,
+  reindexAttempt = 0
+): Promise<any[]> {
+  const [owner, repo] = parseRepoIdToOwnerRepo(repoId);
+  const [remote, branch] = repoId.split(':');
+  
+  const prompt = `Analyze this codebase for code quality and security issues.
+
+Find and return issues in these categories:
+
+SECURITY (Critical):
+- Hardcoded API keys, secrets, passwords, tokens (e.g., API_KEY = "sk_live_abc123")
+- Database credentials in connection strings (e.g., postgresql://user:pass@host)
+- SQL injection vulnerabilities (string concatenation in queries)
+- Use of eval(), exec(), or Function constructor
+- Exposed .env files or credentials
+
+RELIABILITY (High):
+- HTTP/fetch calls without timeout configuration
+- Empty catch blocks that swallow errors (catch () {})
+- Promises without .catch() handlers
+- Missing input validation on API routes
+
+MAINTAINABILITY (Medium):
+- Files over 500 lines (god files)
+- Functions over 75 lines
+- Magic numbers without constants
+- Multiple TODO/FIXME comments clustered together
+
+For each issue found, return it in this JSON format:
+{
+  "findings": [
+    {
+      "category": "security",
+      "ruleId": "hardcoded-secrets",
+      "file": "src/config/api.js",
+      "line": 12,
+      "snippet": "const API_KEY = 'sk_live_abc123'",
+      "severity": "critical"
+    }
+  ]
+}
+
+IMPORTANT: The "line" field MUST be the exact line number where the problematic code appears in the actual file. Do not use function start lines or approximate line numbers - use the precise line where the specific issue is located.
+
+Be thorough and check all code files. Return ONLY the JSON structure above.`;
+
+  console.log(`[Greptile] Querying AI for code issues (session: ${sessionId})...`);
+  
+  try {
+    const response = await fetch(`${GREPTILE_API}/query`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        repositories: [
+          {
+            remote: 'github',
+            repository: `${owner}/${repo}`,
+            branch: branch || 'main'
+          }
+        ],
+        sessionId: sessionId,
+        stream: false
+      })
+    });
+
+    // Handle 410 Gone - repository cache expired
+    if (response.status === 410) {
+      console.log(`[Greptile] ⚠️  Repository cache expired (410 Gone) - Attempt ${reindexAttempt + 1}/${MAX_REINDEX_ATTEMPTS + 1}`);
+      
+      if (reindexAttempt < MAX_REINDEX_ATTEMPTS) {
+        console.log(`[Greptile] 🔄 Re-indexing repository...`);
+        
+        // Clear cache and re-index
+        await clearCacheForRepo(repoId);
+        const repoUrl = `https://github.com/${owner}/${repo}`;
+        const newRepoId = await indexRepository(repoUrl, true);
+        
+        // Wait for indexing
+        const indexed = await waitForIndexing(newRepoId, 300000);
+        if (!indexed) {
+          throw new Error('Re-indexing timed out after 5 minutes');
+        }
+        
+        console.log(`[Greptile] ✅ Re-indexing complete, retrying query...`);
+        await sleep(REINDEX_DELAY_MS);
+        
+        // Retry with incremented attempt counter
+        return queryForIssues(newRepoId, sessionId, reindexAttempt + 1);
+      }
+      
+      throw new Error(`Greptile repository permanently expired after ${reindexAttempt + 1} attempts.`);
+    }
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Greptile query failed: ${response.status} ${errorText}`);
+    }
+
+    const data = await response.json();
+    
+    // Parse Greptile's AI response
+    const content = data.message || '';
+    console.log(`[Greptile] AI response received (${content.length} chars)`);
+    console.log(`[Greptile] Response keys:`, Object.keys(data));
+    
+    // Try to extract JSON from the response
+    let findings: any[] = [];
+    try {
+      // Look for JSON in markdown code blocks or plain text
+      const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || 
+                       content.match(/```\s*([\s\S]*?)\s*```/) ||
+                       content.match(/\{[\s\S]*"findings"[\s\S]*\}/);
+      
+      if (jsonMatch) {
+        const jsonStr = jsonMatch[1] || jsonMatch[0];
+        const parsed = JSON.parse(jsonStr);
+        findings = parsed.findings || [];
+      } else {
+        // Try parsing the entire content as JSON
+        const parsed = JSON.parse(content);
+        findings = parsed.findings || [];
+      }
+      
+      console.log(`[Greptile] ✅ Parsed ${findings.length} findings from AI response`);
+    } catch (e) {
+      console.error('[Greptile] Failed to parse AI response as JSON:', e);
+      console.log('[Greptile] Raw response (first 1000 chars):', content.substring(0, 1000));
+      console.log('[Greptile] Raw response (last 1000 chars):', content.substring(Math.max(0, content.length - 1000)));
+    }
+    
+    return findings;
+
+  } catch (error: any) {
+    console.error('[Greptile] Query error:', error.message);
+    throw error;
+  }
+}
+
+/**
  * Get repository metadata (languages, frameworks, file count)
  * Uses config file detection for better reliability
  */

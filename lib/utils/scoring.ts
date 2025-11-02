@@ -10,11 +10,9 @@ const SEVERITY_MAP: Record<string, Severity> = {
   'hardcoded-secrets': 'critical',
   'hardcoded-credentials': 'critical',
   'sql-injection': 'critical',
-  
-  // High - significant security or reliability concerns
-  'eval-usage': 'high',
-  'exposed-env': 'high',
-  'no-validation': 'high',
+  'eval-usage': 'critical',      // Mapped from 'high'
+  'exposed-env': 'critical',     // Mapped from 'high'
+  'no-validation': 'critical',   // Mapped from 'high'
   
   // Medium - reliability and robustness issues
   'no-http-timeout': 'medium',
@@ -78,21 +76,26 @@ export function calculateETA(ruleId: string, snippet: string): ETA {
 
 /**
  * Calculate time saved by having this issue documented in the roadmap
- * Includes triage time + documentation time
+ * Represents time saved by automated detection + having the fix documented
+ * Higher severity issues save more time because they're harder to discover manually
  */
 export function calculateMinutesSaved(severity: Severity, eta: ETA): number {
-  // Base time for discovering and triaging the issue
-  const triageTime: Record<Severity, number> = {
-    critical: 15, // Critical issues take longer to triage
-    high: 12,
-    medium: 7,
-    low: 3,
+  // Base time for discovering and triaging the issue manually
+  const discoveryTime: Record<Severity, number> = {
+    critical: 60, // Critical issues are hard to find and would waste lots of time
+    high: 45,
+    medium: 20,
+    low: 10,
   };
   
-  // Additional time saved by having fix documented
-  const documentationTime = 2;
+  // Additional time saved by having the fix documented (no research needed)
+  const documentationTime: Record<ETA, number> = {
+    easy: 5,    // Simple fix docs save less time
+    medium: 15, // Medium fixes benefit more from docs
+    large: 30,  // Complex fixes save significant time with pre-written fix
+  };
   
-  return triageTime[severity] + documentationTime;
+  return discoveryTime[severity] + documentationTime[eta];
 }
 
 /**

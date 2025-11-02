@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import TimelineVisualization from "@/components/timeline-viz"
 import CodeBlock from "@/components/code-block"
-import { Clock, Wrench, ExternalLink } from "lucide-react"
+import { ExternalLink } from "lucide-react"
 import type { Finding } from "@/types"
 
 interface FindingCardProps {
@@ -102,17 +102,7 @@ export default function FindingCard({ finding, repoUrl }: FindingCardProps) {
       </div>
 
       {/* Footer */}
-      <div className="mt-6 flex items-center justify-between text-sm">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1 text-muted-foreground">
-            <Clock className="w-4 h-4" />
-            <span>{finding.minutesSaved} min</span>
-          </div>
-          <div className={`flex items-center gap-1 font-semibold ${etaConf.color}`}>
-            <Wrench className="w-4 h-4" />
-            <span>{etaConf.label}</span>
-          </div>
-        </div>
+      <div className="mt-6 flex items-center justify-end text-sm">
         <a
           href={getGitHubUrl()}
           target="_blank"
